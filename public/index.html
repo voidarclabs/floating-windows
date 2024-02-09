@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+        }
+        #floatingwindow {
+            height: 200px;
+            width: 400px;
+            background-color: purple;
+
+        }
+    </style>
+</head>
+<body>
+    <div onmouseover="trackMouseMovement('floatingwindow')" id="floatingwindow"></div>
+    <script>
+        // function checkforclick() {
+        //     let mouseDown = 0
+        //     document.body.onmousedown = function() { 
+        //     ++mouseDown;
+        //     }
+        //     document.body.onmouseup = function() {
+        //     --mouseDown;
+        //     }
+        //     if (mouseDown == 1) {
+
+        //     }
+        // }
+        function trackMouseMovement(elementId) {
+            // Get the target element
+            const targetElement = document.getElementById(elementId);
+
+            // Check if the element exists
+            if (!targetElement) {
+                console.error("Element not found");
+                return;
+            }
+
+            // Variables to store initial mouse position
+            let startX, startY;
+
+            // Variable to store the mouse down state
+            let isMouseDown = false;
+
+            // Variable to store the live change in x and y positions
+            let deltaX = 0, deltaY = 0;
+
+            // Add mousedown event listener
+            targetElement.addEventListener("mousedown", (event) => {
+                isMouseDown = true;
+                startX = event.clientX;
+                startY = event.clientY;
+            });
+
+            // Add mouseup event listener
+            document.addEventListener("mouseup", () => {
+                isMouseDown = false;
+            });
+
+            // Add mousemove event listener
+            document.addEventListener("mousemove", (event) => {
+                if (isMouseDown) {
+                // Calculate the change in x and y positions
+                deltaX = event.clientX - startX;
+                deltaY = event.clientY - startY;
+
+                // Output the change in x and y positions to a variable or console
+                console.log(`Change in X: ${deltaX}, Change in Y: ${deltaY}`);
+
+                // Update the initial mouse position
+                startX = event.clientX;
+                startY = event.clientY;
+            }
+  });
+}
+
+    </script>
+</body>
+</html>
