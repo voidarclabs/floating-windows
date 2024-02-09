@@ -3,84 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Resizable Draggable Windows</title>
     <style>
         body {
             padding: 0;
             margin: 0;
             min-height: 100vh;
         }
+        .draggableDiv {
+            min-height: 200px;
+            min-width: 200px;
+            background-color: purple;
+            position: absolute;
+            cursor: move;
+            overflow: hidden;
+        }
+        .resizer {
+            width: 10px;
+            height: 10px;
+            background-color: #fff;
+            position: absolute;
+        }
         #floatingwindow {
             height: 200px;
             width: 400px;
             background-color: purple;
-
+            position: absolute;
+        }
+        #floatingwindow2 {
+            height: 200px;
+            width: 400px;
+            padding-left: 10px;
+            background-color: green;
+            position: absolute;
+        }
+        .bottom-right-resize {
+            bottom: 0;
+            right: 0;
+            cursor: se-resize;
+        }
+        .topnav {
+            height: 20px;
+            width: 100%;
+        }
+        .appframe {
+            height: calc(100% - 35px);
+            width: 100%;
         }
     </style>
 </head>
 <body>
-    <div onmouseover="trackMouseMovement('floatingwindow')" id="floatingwindow"></div>
+    <div class="draggableDiv" id="floatingwindow">
+        <div class="topnav"></div>
+        <iframe class="appframe" src="index copy.html" frameborder="0"></iframe>
+        <div class="resizer bottom-right-resize" id="resizer"></div>
+    </div>
+    <div class="draggableDiv" id="floatingwindow2">
+        <div class="resizer bottom-right-resize" id="resizer2"></div>
+    </div>
     <script>
-        // function checkforclick() {
-        //     let mouseDown = 0
-        //     document.body.onmousedown = function() { 
-        //     ++mouseDown;
-        //     }
-        //     document.body.onmouseup = function() {
-        //     --mouseDown;
-        //     }
-        //     if (mouseDown == 1) {
+      // Declare isResizing at the top-level scope
+      let isResizing = false;
 
-        //     }
-        // }
-        function trackMouseMovement(elementId) {
-            // Get the target element
-            const targetElement = document.getElementById(elementId);
+      function makeResizable(element, resizer) {
+        let originalMouseX;
+        let originalMouseY;
+        let originalWidth;
+        let originalHeight;
 
-            // Check if the element exists
-            if (!targetElement) {
-                console.error("Element not found");
-                return;
-            }
+        resizer.addEventListener('mousedown', function (e) {
+          isResizing = true;
+          originalMouseX = e.clientX;
+          originalMouseY = e.clientY;
+          originalWidth = element.offsetWidth;
+          originalHeight = element.offsetHeight;
 
-            // Variables to store initial mouse position
-            let startX, startY;
+          document.addEventListener('mousemove', handleMouseMove);
+          document.addEventListener('mouseup', () => {
+            isResizing = false;
+            document.removeEventListener('mousemove', handleMouseMove);
+          });
+        });
 
-            // Variable to store the mouse down state
-            let isMouseDown = false;
+        function handleMouseMove(e) {
+          if (isResizing) {
+            const deltaX = e.clientX - originalMouseX;
+            const deltaY = e.clientY - originalMouseY;
 
-            // Variable to store the live change in x and y positions
-            let deltaX = 0, deltaY = 0;
+            const newWidth = Math.max(originalWidth + deltaX, 100);
+            const newHeight = Math.max(originalHeight + deltaY, 100);
 
-            // Add mousedown event listener
-            targetElement.addEventListener("mousedown", (event) => {
-                isMouseDown = true;
-                startX = event.clientX;
-                startY = event.clientY;
-            });
+            element.style.width = newWidth + 'px';
+            element.style.height = newHeight + 'px';
+          }
+        }
+      }
 
-            // Add mouseup event listener
-            document.addEventListener("mouseup", () => {
-                isMouseDown = false;
-            });
+      function makeDraggable(element) {
+        let offsetX, offsetY, isDragging = false;
 
-            // Add mousemove event listener
-            document.addEventListener("mousemove", (event) => {
-                if (isMouseDown) {
-                // Calculate the change in x and y positions
-                deltaX = event.clientX - startX;
-                deltaY = event.clientY - startY;
+        element.addEventListener('mousedown', function (e) {
+          isDragging = true;
+          offsetX = e.clientX - element.getBoundingClientRect().left;
+          offsetY = e.clientY - element.getBoundingClientRect().top;
 
-                // Output the change in x and y positions to a variable or console
-                console.log(`Change in X: ${deltaX}, Change in Y: ${deltaY}`);
+          bringToFront(element);
+        });
 
-                // Update the initial mouse position
-                startX = event.clientX;
-                startY = event.clientY;
-            }
-  });
-}
+        document.addEventListener('mousemove', function (e) {
+          if (isDragging && !isResizing) {
+            const x = e.clientX - offsetX;
+            const y = e.clientY - offsetY;
 
+            element.style.left = x + 'px';
+            element.style.top = y + 'px';
+          }
+        });
+
+        document.addEventListener('mouseup', function () {
+          isDragging = false;
+        });
+      }
+
+      function bringToFront(element) {
+        const allDivs = document.querySelectorAll('.draggableDiv');
+        allDivs.forEach(div => {
+          div.style.zIndex = 0;
+        });
+
+        element.style.zIndex = 1;
+      }
+
+      // Get the draggable div elements
+      const draggableDiv = document.getElementById('floatingwindow');
+      const draggableDiv2 = document.getElementById('floatingwindow2');
+      const resizer = document.querySelector('#floatingwindow .resizer');
+      const resizer2 = document.querySelector('#floatingwindow2 .resizer');
+
+      // Make the div draggable and resizable
+      makeDraggable(draggableDiv);
+      makeDraggable(draggableDiv2);
+      makeResizable(draggableDiv, resizer);
+      makeResizable(draggableDiv2, resizer2);
     </script>
 </body>
 </html>

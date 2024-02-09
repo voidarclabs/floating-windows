@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+            background-color: white;
+        }
+        #floatingwindow {
+            height: 200px;
+            width: 400px;
+            background-color: purple;
+            position: absolute;
+        }
+        #floatingwindow2 {
+            height: 200px;
+            width: 400px;
+            padding-left: 10px;
+            background-color: green;
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+    <div class="draggableDiv" id="floatingwindow"></div>
+    <div class='draggableDiv' id="floatingwindow2"></div>
+    <script>
+// Function to make a div draggable
+function makeDraggable(element) {
+  let offsetX, offsetY, isDragging = false;
+
+  // Event listener for mouse down
+  element.addEventListener('mousedown', function (e) {
+    isDragging = true;
+    offsetX = e.clientX - element.getBoundingClientRect().left;
+    offsetY = e.clientY - element.getBoundingClientRect().top;
+
+    bringToFront(element);
+  });
+
+  // Event listener for mouse move
+  document.addEventListener('mousemove', function (e) {
+    if (isDragging) {
+      const x = e.clientX - offsetX;
+      const y = e.clientY - offsetY;
+
+      // Update the position of the draggable div
+      element.style.left = x + 'px';
+      element.style.top = y + 'px';
+    }
+  });
+
+  // Event listener for mouse up
+  document.addEventListener('mouseup', function () {
+    isDragging = false;
+  });
+}
+
+function bringToFront(element) {
+  const allDivs = document.querySelectorAll('.draggableDiv');
+  allDivs.forEach(div => {
+    div.style.zIndex = 0;
+  });
+
+  element.style.zIndex = 1;
+}
+
+// Get the draggable div elements
+const draggableDiv = document.getElementById('floatingwindow');
+const draggableDiv2 = document.getElementById('floatingwindow2');
+
+// Make the div draggable
+makeDraggable(draggableDiv);
+// Make the div draggable
+makeDraggable(draggableDiv2);
+    </script>
+</body>
+</html>
